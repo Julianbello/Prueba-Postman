@@ -99,5 +99,6 @@ module.exports = {
   getUsers,
   getUserById,
   createUser,
-  updateUser
+  updateUser,
+  deleteUser
 };
