@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mi Aplicación</title>
-    <script type="module" src="/src/main.js"></script>
   </head>
   <body>
     <h1>CRUD de contactos</h1>
@@ -20,5 +19,98 @@
     <p>Resultados:</p>
     <div id="resultado"></div>
 
+    <script>
+      // Obtener referencias a los elementos del DOM
+      const boton = document.getElementById('btnCargar');
+      const boton1 = document.getElementById('btnCambiar');
+      const boton2 = document.getElementById('btnCrear');
+      const contenedorResultado = document.getElementById('resultado');
+
+      async function obtenerDatos() {
+        try {
+          contenedorResultado.textContent = 'Cargando...';
+          const response = await fetch('/api/users');
+          if (!response.ok) {
+            throw new Error(`Error en la petición: ${response.status}`);
+          }
+          const datos = await response.json();
+          contenedorResultado.innerHTML = `<pre>${JSON.stringify(datos, null, 2)}</pre>`;
+        } catch (error) {
+          console.error('Error al obtener datos:', error);
+          contenedorResultado.textContent = 'Ocurrió un error al cargar los datos.';
+        }
+      }
+
+      async function actualizarUsuario() {
+        const contenedor = document.getElementById('resultado');
+        const id = document.getElementById('userId').value.trim();
+        const name = document.getElementById('userName').value.trim();
+        const email = document.getElementById('userEmail').value.trim();
+
+        if (!id) {
+          if (contenedor) contenedor.textContent = 'Por favor, ingresa el ID del usuario.';
+          return;
+        }
+        if (!name || !email) {
+          if (contenedor) contenedor.textContent = 'Los campos Name y Email son requeridos.';
+          return;
+        }
+
+        try {
+          if (contenedor) contenedor.textContent = 'Actualizando usuario...';
+          const response = await fetch(`/api/users/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email })
+          });
+          const datos = await response.json();
+          if (!response.ok) {
+            throw new Error(datos.message || `Error HTTP: ${response.status}`);
+          }
+          if (contenedor) {
+            contenedor.textContent = `¡Usuario actualizado con éxito!\n\n${JSON.stringify(datos, null, 2)}`;
+          }
+        } catch (error) {
+          console.error('Error al actualizar:', error);
+          if (contenedor) contenedor.textContent = `Error: ${error.message}`;
+        }
+      }
+
+      async function crearUsuario() {
+        const contenedor = document.getElementById('resultado');
+        const name = document.getElementById('userName').value.trim();
+        const email = document.getElementById('userEmail').value.trim();
+
+        if (!name || !email) {
+          if (contenedor) contenedor.textContent = 'Los campos Name y Email son obligatorios.';
+          return;
+        }
+
+        try {
+          if (contenedor) contenedor.textContent = 'Creando usuario...';
+          const response = await fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email })
+          });
+          const datos = await response.json();
+          if (!response.ok) {
+            throw new Error(datos.message || `Error HTTP: ${response.status}`);
+          }
+          if (contenedor) {
+            contenedor.textContent = `¡Usuario creado con éxito! (Código ${response.status})\n\n${JSON.stringify(datos, null, 2)}`;
+          }
+          document.getElementById('userName').value = '';
+          document.getElementById('userEmail').value = '';
+        } catch (error) {
+          console.error('Error al crear:', error);
+          if (contenedor) contenedor.textContent = `Error: ${error.message}`;
+        }
+      }
+
+      boton2.addEventListener('click', crearUsuario);
+      boton1.addEventListener('click', actualizarUsuario);
+      boton.addEventListener('click', obtenerDatos);
+    </script>
   </body>
 </html>
