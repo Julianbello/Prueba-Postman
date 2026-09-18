@@ -76,6 +76,24 @@ const updateUser = (req, res) => {
     });
   }
 };
+// DELETE: Eliminar un usuario
+const deleteUser = (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const deleted = UserModel.remove(id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.status(200).json(deleted);
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error al eliminar el usuario',
+      error: error.message
+    });
+  }
+};
 
 module.exports = {
   getUsers,
