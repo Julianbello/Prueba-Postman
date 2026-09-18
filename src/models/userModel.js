@@ -4,10 +4,7 @@ const usersDB = [
   { id: 2, name: 'Ana', email: 'ana@example.com' }
 ];
 
-let nextId = 3;
-
 class UserModel {
-
   static getAll() {
     return usersDB;
   }
@@ -16,34 +13,20 @@ class UserModel {
     return usersDB.find(user => user.id === id);
   }
 
-  static create({ name, email }) {
-    const newUser = { id: nextId++, name, email };
+  static create(userData) {
+    const newUser = {
+      id: usersDB.length + 1,
+      ...userData
+    };
     usersDB.push(newUser);
     return newUser;
   }
 
   static update(id, updateData) {
     const index = usersDB.findIndex(user => user.id === id);
-
     if (index === -1) return null;
-
-    // Se ignora cualquier "id" que venga en el body
-    const { id: _ignorado, ...datos } = updateData;
-
-    usersDB[index] = {
-      ...usersDB[index],
-      ...datos
-    };
-
+    usersDB[index] = { ...usersDB[index], ...updateData };
     return usersDB[index];
-  }
-
-  static remove(id) {
-    const index = usersDB.findIndex(user => user.id === id);
-
-    if (index === -1) return null;
-
-    return usersDB.splice(index, 1)[0];
   }
 }
 
