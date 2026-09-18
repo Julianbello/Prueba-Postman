@@ -18,4 +18,5 @@ app.get('/', (req, res) => {
 
 app.use('/api', userRoutes);
 
+
 module.exports = app;
